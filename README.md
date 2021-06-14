@@ -1,1 +1,1 @@
-## Aplikacja rekomendująca badania do wykonania przed zabiegiem chirurgicznym
+## Aplikacja wykrywająca COVID-19 na zdjęciach rentgenowskich klatki piersiowej
