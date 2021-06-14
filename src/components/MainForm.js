@@ -1,13 +1,7 @@
 import React, {useState} from "react";
 import Button from "@material-ui/core/Button";
-import {MenuItem, TextField} from "@material-ui/core";
 
 function MainForm() {
-    const imageFormats = {
-        "jpg" : "jpg",
-        "png" : "png"
-    }
-    const [format, setFormat] = useState("")
     const [selectedFile, setSelectedFile] = useState("")
     const [error, setError] = useState("")
     const [covid, setCovid] = useState("")
@@ -50,21 +44,7 @@ function MainForm() {
             <div className="upload-image">
                 <input type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
-            <TextField
-                required={true}
-                id="select-image-format"
-                select
-                label="Select image format"
-                value={format}
-                onChange={(e) => setFormat(e.target.value)}
-            >
-                {Object.keys(imageFormats).map((format) => (
-                    <MenuItem key={format} value={format}>
-                        {imageFormats[format]}
-                    </MenuItem>
-                ))}
-            </TextField>
-            {format && selectedFile &&
+            {selectedFile &&
             <Button variant="contained"
                     color="secondary"
                     type="button"
