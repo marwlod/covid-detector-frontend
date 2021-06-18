@@ -106,12 +106,13 @@ function MainForm() {
             }
             {covid &&
             <div style={{marginTop: 30}}>
+                Results
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
                                 <TableCell>Classification group</TableCell>
-                                <TableCell align="right">Result</TableCell>
+                                <TableCell align="right">Probability</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -142,7 +143,9 @@ function MainForm() {
             {error}
             {heatmapImage &&
             <div style={{marginTop: 10}}>
-                <img src={heatmapImage} alt="Chest X-Ray with GradCAM heatmap"/>
+                Grad-CAM heatmap
+                <br/>
+                <img src={heatmapImage} alt="Chest X-Ray with Grad-CAM heatmap"/>
             </div>
             }
         </div>
