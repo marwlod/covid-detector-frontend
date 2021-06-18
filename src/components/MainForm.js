@@ -1,5 +1,8 @@
 import React, {useState} from "react";
 import Button from "@material-ui/core/Button";
+import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+
+const BASE_BACKEND_URL = "http://localhost:8080"
 
 function MainForm() {
     const [selectedFile, setSelectedFile] = useState("")
@@ -13,16 +16,27 @@ function MainForm() {
         setSelectedFile(event.target.files[0])
     }
 
+    function resetResults() {
+        setCovid("")
+        setNormal("")
+        setViral("")
+        setError("")
+        setHeatmapImage("")
+    }
+
     function classify() {
         const formData = new FormData();
         formData.append('file', selectedFile);
-        fetch('http://localhost:8080/cam/', {
+        fetchCamImage(formData)
+        performClassification(formData)
+    }
+
+    function fetchCamImage(sourceImage) {
+        fetch(BASE_BACKEND_URL + '/cam/', {
             method: 'POST',
-            body: formData,
+            body: sourceImage,
         }).then(
-            async response => {
-                return response.blob()
-            }
+            response => response.blob()
         ).then(
             data => {
                 console.log(data)
@@ -45,23 +59,19 @@ function MainForm() {
             error => {
                 console.error(error)
                 setError(error.message)
-                setCovid("")
-                setNormal("")
-                setViral("")
+                setHeatmapImage("")
             }
         );
+    }
 
-
-        fetch('http://localhost:8080/classify/', {
+    function performClassification(sourceImage) {
+        fetch(BASE_BACKEND_URL + '/classify/', {
             method: 'POST',
-            body: formData,
+            body: sourceImage,
         }).then(
-            async response => {
-                return response.json()
-            }
+            response => response.json()
         ).then(
             data => {
-                console.log(data)
                 setError("")
                 setCovid(data.covid)
                 setNormal(data.normal)
@@ -80,30 +90,61 @@ function MainForm() {
 
     return (
         <div className="App">
-            <div className="upload-image">
-                <input type="file" name="image" onChange={onFileChange} accept="image/*"/>
+            <div style={{marginTop: 50}}>
+                <input onInput={resetResults} type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
             {selectedFile &&
-            <Button variant="contained"
-                    color="secondary"
-                    type="button"
-                    text="Form"
-                    onClick={() => classify()}>
-                Classify
-            </Button>
+            <div style={{marginTop: 10}}>
+                <Button variant="contained"
+                        color="primary"
+                        type="button"
+                        text="Form"
+                        onClick={() => classify()}>
+                    Classify
+                </Button>
+            </div>
             }
             {covid &&
-            <div>
-                COVID-19: {covid}
-                <br/>
-                NORMAL: {normal}
-                <br/>
-                VIRAL PNEUMONIA: {viral}
+            <div style={{marginTop: 30}}>
+                <TableContainer component={Paper}>
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Classification group</TableCell>
+                                <TableCell align="right">Result</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow key="covid">
+                                <TableCell component="th" scope="row">
+                                    COVID-19
+                                </TableCell>
+                                <TableCell align="right">{covid}</TableCell>
+                            </TableRow>
+                            <TableRow key="normal">
+                                <TableCell component="th" scope="row">
+                                    Normal
+                                </TableCell>
+                                <TableCell align="right">{normal}</TableCell>
+                            </TableRow>
+                            <TableRow key="viral">
+                                <TableCell component="th" scope="row">
+                                    Viral Pneumonia
+                                </TableCell>
+                                <TableCell align="right">{viral}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </div>
             }
             <br/>
             {error}
-            <img src={heatmapImage} alt="X-Ray with HeatMap"/>
+            {heatmapImage &&
+            <div style={{marginTop: 10}}>
+                <img src={heatmapImage} alt="Chest X-Ray with GradCAM heatmap"/>
+            </div>
+            }
         </div>
     );
 }
