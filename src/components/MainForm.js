@@ -95,7 +95,7 @@ function MainForm() {
 
     return (
         <div className="App">
-            COVID-19 detection on chest X-Ray images
+            COVID-19 detection on chest X-ray images
             <div style={{marginTop: 50}}>
                 <input onInput={resetResults} type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
