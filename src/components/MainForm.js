@@ -12,6 +12,8 @@ function MainForm() {
     const [viral, setViral] = useState("")
     const [heatmapImage, setHeatmapImage] = useState("")
     const [loadingCam, setLoadingCam] = useState(false)
+    const [probablyCovid, setProbablyCovid] = useState(false)
+    const [probablyCovidText, setProbablyCovidText] = useState("")
 
     function onFileChange(event) {
         setSelectedFile(event.target.files[0])
@@ -23,6 +25,7 @@ function MainForm() {
         setViral("")
         setError("")
         setHeatmapImage("")
+        setProbablyCovidText("")
     }
 
     function classify() {
@@ -44,6 +47,14 @@ function MainForm() {
                 setCovid(data.covid)
                 setNormal(data.normal)
                 setViral(data.viral)
+                const isCovid = parseFloat(data.covid) > parseFloat(data.normal) &&
+                                parseFloat(data.covid) > parseFloat(data.viral);
+                setProbablyCovid(isCovid)
+                if (isCovid) {
+                    setProbablyCovidText("Probably COVID-19 positive")
+                } else {
+                    setProbablyCovidText("Probably not COVID-19")
+                }
                 fetchCamImage(sourceImage)
             }
         ).catch(
@@ -53,6 +64,7 @@ function MainForm() {
                 setCovid("")
                 setNormal("")
                 setViral("")
+                setProbablyCovidText("")
             }
         );
     }
@@ -66,7 +78,6 @@ function MainForm() {
             response => response.blob()
         ).then(
             data => {
-                console.log(data)
                 const saveByteArray = (function () {
                     const a = document.createElement("a");
                     document.body.appendChild(a);
@@ -79,7 +90,7 @@ function MainForm() {
                         window.URL.revokeObjectURL(url);
                     };
                 }());
-                saveByteArray(data, 'example.png');
+                saveByteArray(data, 'xray_image.png');
                 setError("")
                 setLoadingCam(false)
             }
@@ -110,6 +121,7 @@ function MainForm() {
                 </Button>
             </div>
             }
+            <div style={{marginTop: 10, color: probablyCovid ? "red" : "green"}}>{probablyCovidText}</div>
             {covid &&
             <div style={{marginTop: 30}}>
                 Results
