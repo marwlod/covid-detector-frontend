@@ -11,6 +11,7 @@ function MainForm() {
     const [normal, setNormal] = useState("")
     const [viral, setViral] = useState("")
     const [heatmapImage, setHeatmapImage] = useState("")
+    const [loadingCam, setLoadingCam] = useState(false)
 
     function onFileChange(event) {
         setSelectedFile(event.target.files[0])
@@ -25,43 +26,10 @@ function MainForm() {
     }
 
     function classify() {
+        resetResults();
         const formData = new FormData();
         formData.append('file', selectedFile);
-        fetchCamImage(formData)
         performClassification(formData)
-    }
-
-    function fetchCamImage(sourceImage) {
-        fetch(BASE_BACKEND_URL + '/cam/', {
-            method: 'POST',
-            body: sourceImage,
-        }).then(
-            response => response.blob()
-        ).then(
-            data => {
-                console.log(data)
-                var saveByteArray = (function () {
-                    var a = document.createElement("a");
-                    document.body.appendChild(a);
-                    a.style = "display: none";
-                    return function (data, name) {
-                        const url = window.URL.createObjectURL(data);
-                        a.href = url;
-                        a.download = name;
-                        setHeatmapImage(url)
-                        window.URL.revokeObjectURL(url);
-                    };
-                }());
-                saveByteArray(data, 'example.png');
-                setError("")
-            }
-        ).catch(
-            error => {
-                console.error(error)
-                setError(error.message)
-                setHeatmapImage("")
-            }
-        );
     }
 
     function performClassification(sourceImage) {
@@ -76,6 +44,7 @@ function MainForm() {
                 setCovid(data.covid)
                 setNormal(data.normal)
                 setViral(data.viral)
+                fetchCamImage(sourceImage)
             }
         ).catch(
             error => {
@@ -88,8 +57,45 @@ function MainForm() {
         );
     }
 
+    function fetchCamImage(sourceImage) {
+        setLoadingCam(true)
+        fetch(BASE_BACKEND_URL + '/cam/', {
+            method: 'POST',
+            body: sourceImage,
+        }).then(
+            response => response.blob()
+        ).then(
+            data => {
+                console.log(data)
+                const saveByteArray = (function () {
+                    const a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    return function (data, name) {
+                        const url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.download = name;
+                        setHeatmapImage(url)
+                        window.URL.revokeObjectURL(url);
+                    };
+                }());
+                saveByteArray(data, 'example.png');
+                setError("")
+                setLoadingCam(false)
+            }
+        ).catch(
+            error => {
+                console.error(error)
+                setError(error.message)
+                setHeatmapImage("")
+                setLoadingCam(false)
+            }
+        );
+    }
+
     return (
         <div className="App">
+            COVID-19 detection on chest X-Ray images
             <div style={{marginTop: 50}}>
                 <input onInput={resetResults} type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
@@ -141,6 +147,9 @@ function MainForm() {
             }
             <br/>
             {error}
+            {loadingCam &&
+                <div style={{marginTop: 10}}>Generating Grad-CAM heatmap...</div>
+            }
             {heatmapImage &&
             <div style={{marginTop: 10}}>
                 Grad-CAM heatmap
