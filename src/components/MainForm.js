@@ -51,9 +51,9 @@ function MainForm() {
                                 parseFloat(data.covid) > parseFloat(data.viral);
                 setProbablyCovid(isCovid)
                 if (isCovid) {
-                    setProbablyCovidText("Probably COVID-19 positive")
+                    setProbablyCovidText("Prawdopodobnie COVID-19")
                 } else {
-                    setProbablyCovidText("Probably not COVID-19")
+                    setProbablyCovidText("Prawdopodobnie NIE COVID-19")
                 }
                 fetchCamImage(sourceImage)
             }
@@ -106,7 +106,7 @@ function MainForm() {
 
     return (
         <div className="App">
-            COVID-19 detection on chest X-ray images
+            Aplikacja do wykrywania COVID-19<br/>na zdjęciach rtg klatki piersiowej
             <div style={{marginTop: 50}}>
                 <input onInput={resetResults} type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
@@ -117,20 +117,20 @@ function MainForm() {
                         type="button"
                         text="Form"
                         onClick={() => classify()}>
-                    Classify
+                    Klasyfikuj
                 </Button>
             </div>
             }
             <div style={{marginTop: 10, color: probablyCovid ? "red" : "green"}}>{probablyCovidText}</div>
             {covid &&
             <div style={{marginTop: 30}}>
-                Results
+                Wyniki
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Classification group</TableCell>
-                                <TableCell align="right">Probability</TableCell>
+                                <TableCell>Grupa klasyfikacyjna</TableCell>
+                                <TableCell align="right">Stopień pewności</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -142,13 +142,13 @@ function MainForm() {
                             </TableRow>
                             <TableRow key="normal">
                                 <TableCell component="th" scope="row">
-                                    Normal
+                                    Zdrowy
                                 </TableCell>
                                 <TableCell align="right">{normal}</TableCell>
                             </TableRow>
                             <TableRow key="viral">
                                 <TableCell component="th" scope="row">
-                                    Viral Pneumonia
+                                    Wirusowe zapalenie płuc
                                 </TableCell>
                                 <TableCell align="right">{viral}</TableCell>
                             </TableRow>
@@ -160,13 +160,13 @@ function MainForm() {
             <br/>
             {error}
             {loadingCam &&
-                <div style={{marginTop: 10}}>Generating Grad-CAM heatmap...</div>
+                <div style={{marginTop: 10}}>Generowanie wizualnego wyjaśnienia...</div>
             }
             {heatmapImage &&
             <div style={{marginTop: 10}}>
-                Grad-CAM heatmap
+                Wyjaśnienie<br/>(mapa cieplna aktywacji algorytmu)
                 <br/>
-                <img src={heatmapImage} alt="Chest X-Ray with Grad-CAM heatmap"/>
+                <img src={heatmapImage} alt="zdjęcie rtg z naniesioną mapą cieplną algorytmu"/>
             </div>
             }
         </div>
