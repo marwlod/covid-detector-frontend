@@ -77,23 +77,17 @@ function MainForm() {
         }).then(
             response => response.blob()
         ).then(
-            data => {
-                const saveByteArray = (function () {
-                    const a = document.createElement("a");
-                    document.body.appendChild(a);
-                    a.style = "display: none";
-                    return function (data, name) {
-                        const url = window.URL.createObjectURL(data);
-                        a.href = url;
-                        a.download = name;
-                        setHeatmapImage(url)
-                        window.URL.revokeObjectURL(url);
-                    };
-                }());
-                saveByteArray(data, 'xray_image.png');
+            blob => new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onloadend = () => resolve(reader.result)
+                reader.onerror = reject
+                blob = blob.slice(0, blob.size, "image/png")
+                reader.readAsDataURL(blob)
                 setError("")
                 setLoadingCam(false)
             }
+        )).then(
+            data => setHeatmapImage(data)
         ).catch(
             error => {
                 console.error(error)
@@ -107,7 +101,7 @@ function MainForm() {
     return (
         <div className="App">
             Aplikacja do wykrywania COVID-19<br/>na zdjęciach rtg klatki piersiowej
-            <div style={{marginTop: 50}}>
+            <div style={{marginTop: 20}}>
                 <input onInput={resetResults} type="file" name="image" onChange={onFileChange} accept="image/*"/>
             </div>
             {selectedFile &&
@@ -122,7 +116,7 @@ function MainForm() {
             </div>
             }
             {probablyCovidText &&
-            <div style={{marginTop: 30}}>
+            <div style={{marginTop: 50}}>
                 Podsumowanie
                 <br/>
                 <div style={{marginTop: 10, fontSize: 'calc(10px + 1vmin)', color: probablyCovid ? "red" : "green"}}>
