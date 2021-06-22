@@ -53,7 +53,7 @@ function MainForm() {
                 if (isCovid) {
                     setProbablyCovidText("Prawdopodobnie COVID-19")
                 } else {
-                    setProbablyCovidText("Prawdopodobnie NIE COVID-19")
+                    setProbablyCovidText("Prawdopodobnie nie COVID-19")
                 }
                 fetchCamImage(sourceImage)
             }
@@ -121,10 +121,17 @@ function MainForm() {
                 </Button>
             </div>
             }
-            <div style={{marginTop: 10, color: probablyCovid ? "red" : "green"}}>{probablyCovidText}</div>
-            {covid &&
+            {probablyCovidText &&
             <div style={{marginTop: 30}}>
-                Wyniki
+                Podsumowanie
+                <br/>
+                <div style={{marginTop: 10, fontSize: 'calc(10px + 1vmin)', color: probablyCovid ? "red" : "green"}}>
+                    {probablyCovidText}
+                </div>
+            </div>}
+            {covid &&
+            <div style={{marginTop: 10}}>
+                Szczegóły
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
