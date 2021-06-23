@@ -77,16 +77,18 @@ function MainForm() {
         }).then(
             response => response.blob()
         ).then(
-            blob => new Promise((resolve, reject) => {
-                const reader = new FileReader()
-                reader.onloadend = () => resolve(reader.result)
-                reader.onerror = reject
-                blob = blob.slice(0, blob.size, "image/png")
-                reader.readAsDataURL(blob)
+            blob => {
                 setError("")
                 setLoadingCam(false)
-            }
-        )).then(
+                return new Promise((resolve, reject) => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => resolve(reader.result)
+                        reader.onerror = reject
+                        blob = blob.slice(0, blob.size, "image/png")
+                        reader.readAsDataURL(blob)
+                    }
+                )
+        }).then(
             data => setHeatmapImage(data)
         ).catch(
             error => {
@@ -115,6 +117,7 @@ function MainForm() {
                 </Button>
             </div>
             }
+            <div style={{color: "red"}}>{error}</div>
             {probablyCovidText &&
             <div style={{marginTop: 50}}>
                 Podsumowanie
@@ -158,8 +161,6 @@ function MainForm() {
                 </TableContainer>
             </div>
             }
-            <br/>
-            {error}
             {loadingCam &&
                 <div style={{marginTop: 10}}>Generowanie wizualnego wyjaśnienia...</div>
             }
